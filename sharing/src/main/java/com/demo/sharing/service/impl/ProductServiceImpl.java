@@ -21,8 +21,8 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
 
     @Override
-    public void insertProduct(Product product) {
-        productMapper.insertProduct(product);
+    public Long insertProduct(Product product) {
+        return productMapper.insertProduct(product);
     }
 
     @Override

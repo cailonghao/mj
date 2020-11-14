@@ -10,7 +10,7 @@ import com.demo.sharing.pojo.Product;
 
 public interface ProductMapper {
 
-    int insertProduct(Product product);
+    Long insertProduct(Product product);
 
     Product getProduct(Long id);
 

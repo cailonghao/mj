@@ -2,17 +2,19 @@ package com.demo.sharing.controller.product;
 
 import com.demo.sharing.pojo.Product;
 import com.demo.sharing.service.ProductService;
+import com.demo.sharing.util.Reply;
+import com.demo.sharing.util.ReplyEnum;
+import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,47 +26,67 @@ import java.io.IOException;
  * @Date 2020/11/4 14:35
  * @Created by cai
  */
+@Api("商品API")
+@Slf4j
 @RestController
 @RequestMapping("/product")
 public class ProductController {
 
-    @Autowired
+    @Resource
     SpringTemplateEngine springTemplateEngine;
-    @Autowired
+    @Resource
     ProductService productService;
 
-    @RequestMapping("/html/addProduct/{id}")
-    public String addProduct(@PathVariable long id) {
-        Product product = new Product();
-        product.setTitle("【网课推荐款】HP/惠普星14青春版星系列14英寸轻薄窄边框笔记本学生本便携办公手提电脑惠普官方旗舰店官网");
-        product.setFtitle("超轻薄1.43kg 微边框6.5mm ID:" + id);
-        product.setPrice(2099d);
-        productService.insertProduct(product);
-        return "success";
-    }
-
-    @ResponseBody
-    @RequestMapping("/addProduct/{id}")
-    public String addProduct(HttpServletRequest request, @PathVariable Long id) {
-        write(productService.getProduct(id), id);
-        return "success";
+    @ApiOperation(value = "编辑商品", produces = "application/json", notes = "编辑商品", httpMethod = "POST", response = Reply.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "title", value = "标题", paramType = "query", dataType = "String", required = true),
+            @ApiImplicitParam(name = "ftitle", value = "副标题", paramType = "query", dataType = "String", required = true),
+            @ApiImplicitParam(name = "pic", value = "图片", paramType = "query", dataType = "String", required = true),
+            @ApiImplicitParam(name = "description", value = "描述", paramType = "query", dataType = "String", required = true),
+            @ApiImplicitParam(name = "price", value = "原价", paramType = "query", dataType = "double", required = true),
+            @ApiImplicitParam(name = "curPrice", value = "现价", paramType = "query", dataType = "double", required = true),
+            @ApiImplicitParam(name = "sort", value = "排序", defaultValue = "0", paramType = "query", dataType = "int", required = false),
+            @ApiImplicitParam(name = "sale", value = "销量", paramType = "query", dataType = "int", required = true),
+            @ApiImplicitParam(name = "stock", value = "库存", paramType = "query", dataType = "int", required = true),
+    })
+    @RequestMapping("/addProduct")
+    public Reply addProduct(@RequestParam String title,
+                            @RequestParam String ftitle,
+                            @RequestParam String pic,
+                            @RequestParam String description,
+                            @RequestParam Double price,
+                            @RequestParam Double curPrice,
+                            @RequestParam(defaultValue = "0") Integer sort,
+                            @RequestParam Integer sale,
+                            @RequestParam Integer stock) {
+        Product p = new Product();
+        p.setTitle(title);
+        p.setFtitle(ftitle);
+        p.setPic(pic);
+        p.setDescription(description);
+        p.setPrice(price);
+        p.setCurPrice(curPrice);
+        p.setSort(sort);
+        p.setSale(sale);
+        p.setStock(stock);
+        Long id = productService.insertProduct(p);
+        write(p);
+        return Reply.otherError(ReplyEnum.SUCCESS);
     }
 
     @Async("taskExecutor")
-    public void write(Product product, Long id) {
+    public void write(Product product) {
+        log.info("创建商品模板:{}", product.getId());
         Context context = new Context();
         context.setVariable("product", product);
-        context.setVariable("title", "哈士奇");
-        context.setVariable("message", "哈士奇是个可爱的狗");
         File dir = new File("F:/nginx-1.18.0/html/product/");
         if (!(dir.exists())) {
             dir.mkdir();
         }
-//        String path = "F:/nginx-1.18.0/html/product" + id + ".html";
-        File file = new File(dir, id + ".html");
+        File file = new File(dir, product.getId() + ".html");
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            springTemplateEngine.process("index", context, writer);
+            springTemplateEngine.process("product", context, writer);
         } catch (IOException e) {
             //todo
             e.printStackTrace();

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.title}"></title>
+</head>
+<body>
+<p th:text="${product.ftitle}"></p>
+
+<div>
+    <div style="width: 50%"></div>
+    <div>
+        <p><span>ID:</span><span th:text="${product.id}"></span></p>
+        <p><span>标题:</span><span th:text="${product.title}"></span></p>
+        <p><span>副标题:</span><span th:text="${product.ftitle}"></span></p>
+        <p><span>价格:</span><span th:text="${product.price}"></span></p>
+    </div>
+</div>
+</body>
+</html>

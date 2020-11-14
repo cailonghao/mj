@@ -6,11 +6,12 @@ create table `product`
     `title`       varchar(255)   NOT NULL,
     `ftitle`      varchar(255) DEFAULT NULL,
     `pic`         varchar(255) DEFAULT NULL,
-    `price`       decimal(10, 2) NOT NULL COMMENT '价格',
-    `sort`        int(11)      DEFAULT NULL COMMENT '排序',
-    `sale`        int(11)      DEFAULT NULL COMMENT '销量',
-    `description` text COMMENT '商品描述',
-    `stock`       int(11)      DEFAULT NULL COMMENT '库存',
+    `price`       decimal(10, 2) NOT NULL COMMENT '原价',
+    `curPrice`    decimal(10, 2) NOT NULL COMMENT '现价',
+    `sort`        int(5)       DEFAULT NULL COMMENT '排序',
+    `sale`        int(5)       DEFAULT NULL COMMENT '销量',
+    `description` varchar(255) COMMENT '商品描述',
+    `stock`       int(5)       DEFAULT NULL COMMENT '库存',
     primary key (`id`)
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4

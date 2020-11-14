@@ -9,7 +9,7 @@ import com.demo.sharing.pojo.Product;
  */
 public interface ProductService {
 
-    void insertProduct(Product product);
+    Long insertProduct(Product product);
 
     Product getProduct(Long id);
 }
